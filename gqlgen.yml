@@ -71,6 +71,10 @@ autobind:
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
+  User:
+    model: github.com/ZihxS/go-graphql/graph/model.User
+  Meetup:
+    model: github.com/ZihxS/go-graphql/graph/model.Meetup
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID

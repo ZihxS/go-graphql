@@ -11,12 +11,21 @@ import (
 	"github.com/ZihxS/go-graphql/graph/model"
 )
 
+// User is the resolver for the user field.
+func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
 // Meetups is the resolver for the meetups field.
 func (r *queryResolver) Meetups(ctx context.Context) ([]*model.Meetup, error) {
 	panic(fmt.Errorf("not implemented: Meetups - meetups"))
 }
 
+// Meetup returns MeetupResolver implementation.
+func (r *Resolver) Meetup() MeetupResolver { return &meetupResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type meetupResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
