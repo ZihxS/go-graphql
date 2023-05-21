@@ -14,6 +14,7 @@ import (
 
 // User is the resolver for the user field.
 func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.User, error) {
+	// return r.UsersRepo.GetUserByID(obj.UserID) // without data loader
 	return getUserLoader(ctx).Load(fmt.Sprint(obj.UserID))
 }
 

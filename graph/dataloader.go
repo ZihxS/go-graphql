@@ -16,7 +16,7 @@ const userLoaderKey ctxKey = "user_loader_key"
 
 func DataloaderMiddleware(db *gorm.DB, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userloader := UserLoader{
+		userLoader := UserLoader{
 			maxBatch: 100,
 			wait:     time.Millisecond,
 			fetch: func(ids []string) ([]*model.User, []error) {
@@ -43,7 +43,7 @@ func DataloaderMiddleware(db *gorm.DB, next http.Handler) http.Handler {
 			},
 		}
 
-		ctx := context.WithValue(r.Context(), userLoaderKey, &userloader)
+		ctx := context.WithValue(r.Context(), userLoaderKey, &userLoader)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
