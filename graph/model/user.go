@@ -1,8 +1,8 @@
 package model
 
 type User struct {
-	ID       string    `json:"id"`
+	ID       int       `json:"id"`
 	Username string    `json:"username"`
 	Email    string    `json:"email"`
-	Meetups  []*Meetup `json:"meetups"`
+	Meetups  []*Meetup `json:"meetups" gorm:"-"`
 }
