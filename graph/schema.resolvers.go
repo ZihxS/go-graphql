@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/ZihxS/go-graphql/graph/model"
@@ -13,19 +14,63 @@ import (
 
 // User is the resolver for the user field.
 func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	user := new(model.User)
+
+	for _, u := range model.DummyUsers {
+		if u.ID == obj.UserID {
+			user = u
+			break
+		}
+	}
+
+	if user == nil {
+		return nil, errors.New("user with id not exist")
+	}
+
+	return user, nil
+}
+
+// CreateMeetup is the resolver for the createMeetup field.
+func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeetup) (*model.Meetup, error) {
+	panic(fmt.Errorf("not implemented: CreateMeetup - createMeetup"))
 }
 
 // Meetups is the resolver for the meetups field.
 func (r *queryResolver) Meetups(ctx context.Context) ([]*model.Meetup, error) {
-	panic(fmt.Errorf("not implemented: Meetups - meetups"))
+	return model.DummyMeetups, nil
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	return model.DummyUsers, nil
+}
+
+// Meetups is the resolver for the meetups field.
+func (r *userResolver) Meetups(ctx context.Context, obj *model.User) ([]*model.Meetup, error) {
+	var m []*model.Meetup
+
+	for _, meetup := range model.DummyMeetups {
+		if meetup.UserID == obj.ID {
+			m = append(m, meetup)
+		}
+	}
+
+	return m, nil
 }
 
 // Meetup returns MeetupResolver implementation.
 func (r *Resolver) Meetup() MeetupResolver { return &meetupResolver{r} }
 
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
 type meetupResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
