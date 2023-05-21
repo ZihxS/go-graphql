@@ -20,3 +20,15 @@ func (r *MeetupsRepo) GetMeetups() ([]*model.Meetup, error) {
 
 	return meetups, err
 }
+
+func (r *MeetupsRepo) GetMeetupsByUserID(id int) ([]*model.Meetup, error) {
+	var meetups []*model.Meetup
+
+	err := r.DB.Where("user_id = ?", id).Find(&meetups).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return meetups, err
+}
