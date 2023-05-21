@@ -13,7 +13,7 @@ import (
 
 // User is the resolver for the user field.
 func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.User, error) {
-	return r.UsersRepo.GetUserByID(obj.ID)
+	return r.UsersRepo.GetUserByID(obj.UserID)
 }
 
 // CreateMeetup is the resolver for the createMeetup field.
@@ -28,20 +28,12 @@ func (r *queryResolver) Meetups(ctx context.Context) ([]*model.Meetup, error) {
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	return model.DummyUsers, nil
+	return r.UsersRepo.GetUsers()
 }
 
 // Meetups is the resolver for the meetups field.
 func (r *userResolver) Meetups(ctx context.Context, obj *model.User) ([]*model.Meetup, error) {
-	var m []*model.Meetup
-
-	for _, meetup := range model.DummyMeetups {
-		if meetup.UserID == obj.ID {
-			m = append(m, meetup)
-		}
-	}
-
-	return m, nil
+	return r.MeetupsRepo.GetMeetupByUserID(obj.ID)
 }
 
 // Meetup returns MeetupResolver implementation.
