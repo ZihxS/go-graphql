@@ -6,7 +6,7 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/ZihxS/go-graphql/graph/model"
 )
@@ -18,7 +18,21 @@ func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.Us
 
 // CreateMeetup is the resolver for the createMeetup field.
 func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeetup) (*model.Meetup, error) {
-	panic(fmt.Errorf("not implemented: CreateMeetup - createMeetup"))
+	if len(input.Name) < 3 {
+		return nil, errors.New("name not long enough")
+	}
+
+	if len(input.Description) < 3 {
+		return nil, errors.New("description not long enough")
+	}
+
+	meetup := &model.Meetup{
+		Name:        input.Name,
+		Description: input.Description,
+		UserID:      4,
+	}
+
+	return r.MeetupsRepo.CreateMeetup(meetup)
 }
 
 // Meetups is the resolver for the meetups field.

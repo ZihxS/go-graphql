@@ -32,3 +32,13 @@ func (r *MeetupsRepo) GetMeetupsByUserID(id int) ([]*model.Meetup, error) {
 
 	return meetups, err
 }
+
+func (r *MeetupsRepo) CreateMeetup(meetup *model.Meetup) (*model.Meetup, error) {
+	result := r.DB.Create(&meetup)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return meetup, nil
+}
