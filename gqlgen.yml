@@ -73,8 +73,14 @@ autobind:
 models:
   User:
     model: github.com/ZihxS/go-graphql/graph/model.User
+    fields:
+      meetups:
+        resolver: true
   Meetup:
     model: github.com/ZihxS/go-graphql/graph/model.Meetup
+    fields:
+      user:
+        resolver: true
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
