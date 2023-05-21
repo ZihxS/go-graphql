@@ -1,22 +1,85 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ZihxS/go-graphql/graph"
+	"github.com/ZihxS/go-graphql/graph/model"
+	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const defaultPort = "1315"
 
+type envConfigs struct {
+	Port        string `mapstructure:"APP_PORT"`
+	DBStringDSN string `mapstructure:"STRING_DSN"`
+	DBUser      string `mapstructure:"DB_USER"`
+	DBPass      string `mapstructure:"DB_PASS"`
+	DBHost      string `mapstructure:"DB_HOST"`
+	DBPort      string `mapstructure:"DB_PORT"`
+	DBName      string `mapstructure:"DB_NAME"`
+	DBMaxOC     int    `mapstructure:"DB_MAX_OPEN_CONNECTIONS"`
+	DBMaxIC     int    `mapstructure:"DB_MAX_IDLE_CONNECTIONS"`
+}
+
+var env *envConfigs
+
+func initEnvConfigs() {
+	env = loadEnvVariables()
+}
+
+func loadEnvVariables() (cfg *envConfigs) {
+	viper.AddConfigPath(".")
+	viper.SetConfigName("app")
+	viper.SetConfigType("env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal("Error reading env file", err)
+	}
+
+	if err := viper.Unmarshal(&cfg); err != nil {
+		log.Fatal(err)
+	}
+
+	return
+}
+
 func main() {
-	port := os.Getenv("PORT")
+	initEnvConfigs()
+
+	dsn := fmt.Sprintf(env.DBStringDSN, env.DBUser, env.DBPass, env.DBHost, env.DBPort, env.DBName)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		PrepareStmt:            true,
+		SkipDefaultTransaction: true,
+	})
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	sqlDB, err := db.DB()
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	sqlDB.SetMaxOpenConns(env.DBMaxOC)
+	sqlDB.SetMaxIdleConns(env.DBMaxIC)
+	sqlDB.SetConnMaxLifetime(time.Minute)
+
+	port := env.Port
 	if port == "" {
 		port = defaultPort
 	}
+
+	db.AutoMigrate(&model.Meetup{}, &model.User{})
 
 	addr := "localhost:" + port
 
