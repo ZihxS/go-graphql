@@ -9,9 +9,11 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ZihxS/go-graphql/graph"
+	"github.com/ZihxS/go-graphql/repo/mysql"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
+	dmysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const defaultPort = "1315"
@@ -54,9 +56,10 @@ func main() {
 	initEnvConfigs()
 
 	dsn := fmt.Sprintf(env.DBStringDSN, env.DBUser, env.DBPass, env.DBHost, env.DBPort, env.DBName)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(dmysql.Open(dsn), &gorm.Config{
 		PrepareStmt:            true,
 		SkipDefaultTransaction: true,
+		Logger:                 logger.Default.LogMode(logger.Info),
 	})
 
 	if err != nil {
@@ -69,6 +72,8 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	defer sqlDB.Close()
+
 	sqlDB.SetMaxOpenConns(env.DBMaxOC)
 	sqlDB.SetMaxIdleConns(env.DBMaxIC)
 	sqlDB.SetConnMaxLifetime(time.Minute)
@@ -80,7 +85,12 @@ func main() {
 
 	addr := "localhost:" + port
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	graphConfig := graph.Config{Resolvers: &graph.Resolver{
+		MeetupsRepo: mysql.MeetupsRepo{DB: db},
+		UsersRepo:   mysql.UsersRepo{DB: db},
+	}}
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graphConfig))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 	http.Handle("/graphql", srv)

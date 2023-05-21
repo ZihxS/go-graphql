@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/ZihxS/go-graphql/graph/model"
@@ -14,20 +13,7 @@ import (
 
 // User is the resolver for the user field.
 func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.User, error) {
-	user := new(model.User)
-
-	for _, u := range model.DummyUsers {
-		if u.ID == obj.UserID {
-			user = u
-			break
-		}
-	}
-
-	if user == nil {
-		return nil, errors.New("user with id not exist")
-	}
-
-	return user, nil
+	return r.UsersRepo.GetUserByID(obj.ID)
 }
 
 // CreateMeetup is the resolver for the createMeetup field.
@@ -37,7 +23,7 @@ func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeet
 
 // Meetups is the resolver for the meetups field.
 func (r *queryResolver) Meetups(ctx context.Context) ([]*model.Meetup, error) {
-	return model.DummyMeetups, nil
+	return r.MeetupsRepo.GetMeetups()
 }
 
 // Users is the resolver for the users field.
