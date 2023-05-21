@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/ZihxS/go-graphql/graph/model"
 )
 
 // User is the resolver for the user field.
 func (r *meetupResolver) User(ctx context.Context, obj *model.Meetup) (*model.User, error) {
-	return r.UsersRepo.GetUserByID(obj.UserID)
+	return getUserLoader(ctx).Load(fmt.Sprint(obj.UserID))
 }
 
 // CreateMeetup is the resolver for the createMeetup field.

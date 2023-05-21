@@ -93,7 +93,7 @@ func main() {
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graphConfig))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
-	http.Handle("/graphql", srv)
+	http.Handle("/graphql", graph.DataloaderMiddleware(db, srv))
 
 	log.Printf("connect to http://localhost:%s for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(addr, nil))
