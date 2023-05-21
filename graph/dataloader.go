@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -21,7 +22,24 @@ func DataloaderMiddleware(db *gorm.DB, next http.Handler) http.Handler {
 			fetch: func(ids []string) ([]*model.User, []error) {
 				var users []*model.User
 				err := db.Where("id IN ?", ids).Find(&users).Error
-				return users, []error{err}
+
+				if err != nil {
+					return nil, []error{err}
+				}
+
+				u := make(map[string]*model.User, len(users))
+
+				for _, user := range users {
+					u[fmt.Sprint(user.ID)] = user
+				}
+
+				result := make([]*model.User, len(ids))
+
+				for i, id := range ids {
+					result[i] = u[id]
+				}
+
+				return result, nil
 			},
 		}
 
