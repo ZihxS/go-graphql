@@ -9,7 +9,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ZihxS/go-graphql/graph"
-	"github.com/ZihxS/go-graphql/graph/model"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -78,8 +77,6 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-
-	db.AutoMigrate(&model.Meetup{}, &model.User{})
 
 	addr := "localhost:" + port
 
