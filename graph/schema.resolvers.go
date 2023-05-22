@@ -41,13 +41,18 @@ func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeet
 // UpdateMeetup is the resolver for the updateMeetup field.
 func (r *mutationResolver) UpdateMeetup(ctx context.Context, id string, input model.UpdateMeetup) (*model.Meetup, error) {
 	idConverted, _ := strconv.Atoi(id)
+
+	if idConverted <= 0 {
+		return nil, errors.New("invalid id")
+	}
+
 	meetup, err := r.MeetupsRepo.GetMeetupByID(idConverted)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if meetup == nil {
+	if meetup == nil || meetup.ID == 0 {
 		return nil, errors.New("meetup not exist")
 	}
 
@@ -79,6 +84,32 @@ func (r *mutationResolver) UpdateMeetup(ctx context.Context, id string, input mo
 	}
 
 	return meetup, nil
+}
+
+// DeleteMeetup is the resolver for the deleteMeetup field.
+func (r *mutationResolver) DeleteMeetup(ctx context.Context, id string) (bool, error) {
+	idConverted, _ := strconv.Atoi(id)
+
+	if idConverted <= 0 {
+		return false, errors.New("invalid id")
+	}
+
+	meetup, err := r.MeetupsRepo.GetMeetupByID(idConverted)
+
+	if err != nil {
+		return false, err
+	}
+
+	if meetup == nil || meetup.ID == 0 {
+		return false, errors.New("meetup not exist")
+	}
+
+	err = r.MeetupsRepo.DeleteMeetup(meetup)
+	if err != nil {
+		return false, fmt.Errorf("error when deleting meetup: %+v", err)
+	}
+
+	return true, nil
 }
 
 // Meetups is the resolver for the meetups field.

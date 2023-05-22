@@ -62,3 +62,13 @@ func (r *MeetupsRepo) UpdateMeetup(meetup *model.Meetup) (*model.Meetup, error) 
 
 	return r.GetMeetupByID(meetup.ID)
 }
+
+func (r *MeetupsRepo) DeleteMeetup(meetup *model.Meetup) error {
+	err := r.DB.Where("id = ?", meetup.ID).Delete(&meetup).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
