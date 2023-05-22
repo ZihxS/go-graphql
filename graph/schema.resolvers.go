@@ -117,6 +117,16 @@ func (r *queryResolver) Meetups(ctx context.Context) ([]*model.Meetup, error) {
 	return r.MeetupsRepo.GetMeetups()
 }
 
+// Meetup is the resolver for the meetup field.
+func (r *queryResolver) Meetup(ctx context.Context, id string) (*model.Meetup, error) {
+	idConverted, _ := strconv.Atoi(id)
+	if idConverted <= 0 {
+		return nil, errors.New("invalid id")
+	}
+
+	return r.MeetupsRepo.GetMeetupByID(idConverted)
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	return r.UsersRepo.GetUsers()

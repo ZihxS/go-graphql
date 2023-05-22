@@ -24,6 +24,8 @@ input UpdateMeetup {
 
 type Query {
   meetups: [Meetup!]!
+  meetup(id: ID!): Meetup!
+
   users: [User!]!
   user(id: ID!): User!
 }
