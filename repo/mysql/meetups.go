@@ -42,3 +42,23 @@ func (r *MeetupsRepo) CreateMeetup(meetup *model.Meetup) (*model.Meetup, error) 
 
 	return meetup, nil
 }
+
+func (r *MeetupsRepo) GetMeetupByID(id int) (meetup *model.Meetup, err error) {
+	err = r.DB.Where("id = ?", id).Find(&meetup).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return meetup, err
+}
+
+func (r *MeetupsRepo) UpdateMeetup(meetup *model.Meetup) (*model.Meetup, error) {
+	err := r.DB.Model(&meetup).Updates(meetup).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return r.GetMeetupByID(meetup.ID)
+}
